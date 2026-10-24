@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#090a12">
+  <title>AM Finder — Preset Search</title>
+  <style>
+    :root { color-scheme: dark; --bg:#090a12; --panel:#111321; --line:#25283b; --muted:#9298b2; --text:#f4f5ff; --purple:#a879ff; --blue:#55c8ff; }
+    * { box-sizing:border-box }
+    body { margin:0; min-height:100vh; color:var(--text); font:15px/1.55 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif; background:radial-gradient(ellipse at 15% 0%,#241644 0,transparent 38%),radial-gradient(ellipse at 100% 25%,#10243d 0,transparent 32%),var(--bg); display:flex; flex-direction:column }
+    main { width:min(760px,calc(100% - 32px)); margin:72px auto 48px; flex:1 }
+    .brand { display:flex; align-items:center; gap:12px; margin-bottom:34px }
+    .mark { width:46px;height:46px;border-radius:15px;display:grid;place-items:center;font-size:23px;background:linear-gradient(135deg,#8651e8,#318bdc);box-shadow:0 8px 30px #7545d455 }
+    .brand small { display:block;color:var(--muted);font-size:11px;letter-spacing:.17em;text-transform:uppercase }
+    h1 { margin:2px 0 0;font-size:21px;letter-spacing:-.04em }
+    .hero { margin-bottom:22px }
+    .eyebrow { color:#b99bff;font-size:12px;letter-spacing:.18em;text-transform:uppercase;font-weight:700 }
+    h2 { font-size:clamp(32px,7vw,48px);line-height:1.08;letter-spacing:-.055em;margin:10px 0 12px }
+    h2 span { background:linear-gradient(90deg,#bc91ff,#63cfff);background-clip:text;-webkit-text-fill-color:transparent }
+    .hero p { color:var(--muted);margin:0;max-width:560px }
+    .card { border:1px solid #ffffff12;background:linear-gradient(145deg,#151727ed,#10121deb);border-radius:20px;padding:24px;box-shadow:0 24px 80px #0005;backdrop-filter:blur(12px) }
+    label.field-label {display:block;font-size:13px;font-weight:650;margin:0 0 9px}
+    .input-wrap { position:relative }
+    .input-wrap .icon { position:absolute;left:15px;top:50%;transform:translateY(-50%);color:#858ba6;font-size:17px }
+    input[type=url] { width:100%;height:54px;padding:0 15px 0 44px;color:var(--text);background:#0a0c16;border:1px solid #30334a;border-radius:12px;outline:none;font:inherit;transition:.2s }
+    input[type=url]:focus { border-color:#9869ed;box-shadow:0 0 0 3px #9869ed24 }
+    input::placeholder { color:#656b83 }
+    .options { display:flex;align-items:center;justify-content:space-between;gap:16px;margin:16px 0 20px }
+    .toggle { display:flex;align-items:center;gap:10px;color:#c2c6d8;font-size:13px;cursor:pointer;user-select:none }
+    .toggle input {position:absolute;opacity:0;width:1px;height:1px}
+    .switch {width:38px;height:22px;border-radius:99px;background:#34374b;position:relative;transition:.2s;flex:none}
+    .switch:after {content:"";position:absolute;width:16px;height:16px;border-radius:50%;background:#d3d5e1;top:3px;left:3px;transition:.2s}
+    .toggle input:checked + .switch {background:linear-gradient(90deg,#8752e8,#438fef)}
+    .toggle input:checked + .switch:after {left:19px;background:white}
+    button {height:50px;width:100%;border:0;border-radius:12px;color:white;background:linear-gradient(100deg,#8149dc,#397fe0);font:700 15px inherit;cursor:pointer;box-shadow:0 8px 24px #6441c23b;transition:transform .15s,filter .15s}
+    button:hover {filter:brightness(1.12);transform:translateY(-1px)} button:disabled {opacity:.65;cursor:wait;transform:none}
+    .status {display:none;margin-top:15px;padding:11px 13px;border-radius:10px;font-size:13px}
+    .status.show {display:block}.status.loading {color:#b8caff;background:#17213a}.status.error {color:#ffb8c1;background:#341a25}.status.ok {color:#a5f0d2;background:#132b27}
+    .status-log {max-height:180px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;font:12px/1.7 ui-monospace,SFMono-Regular,Menlo,monospace}
+    .status-log .log-line::before {content:"> ";color:#7e9bdb}
+    .spinner {display:inline-block;width:14px;height:14px;border:2px solid #ffffff55;border-top-color:white;border-radius:50%;vertical-align:-2px;margin-right:8px;animation:spin .7s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+    #results {display:none;margin-top:20px}.result-head {display:flex;justify-content:space-between;gap:16px;align-items:flex-start}.result-head h3 {font-size:17px;margin:0 0 4px}.author {color:var(--muted);font-size:13px}.stats {display:flex;gap:8px;flex-wrap:wrap;margin:17px 0}.stat {padding:8px 11px;background:#0b0d17;border:1px solid #ffffff0d;border-radius:10px;color:#c4c8dc;font-size:12px}.stat b {color:white;margin-left:4px}.section-title {font-size:12px;color:#aeb3ca;letter-spacing:.1em;text-transform:uppercase;margin:18px 0 10px}.preset-list {display:grid;gap:12px}.preset {display:flex;align-items:center;justify-content:space-between;gap:14px;padding:15px;background:#0b0d17;border:1px solid #ffffff0e;border-radius:12px}.preset-title {font-size:13px;font-weight:650}.preset-meta {color:var(--muted);font-size:11px;margin-top:3px}.preset-actions {display:flex;align-items:center;gap:8px;flex:none}.preset-actions a,.preset-actions button {width:auto;height:auto;min-height:36px;display:inline-flex;align-items:center;justify-content:center;text-decoration:none;color:white;padding:8px 11px;border-radius:9px;font:650 12px/1.2 ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;box-shadow:none;transition:transform .18s ease,filter .18s ease,background-color .18s ease}.preset-actions a {background:#7040bb;border:1px solid #9a6ce1}.preset-actions button {background:#3b4544;border:1px solid #60746c;cursor:pointer}.preset-actions button:hover {background:#315f4e}.preset-actions a:hover {background:#8652d3}.preset-actions a:hover,.preset-actions button:hover {filter:brightness(1.12);transform:translateY(-2px)}.preset-actions a:active,.preset-actions button:active {transform:translateY(0)}.empty {color:var(--muted);font-size:13px;padding:14px;background:#0b0d17;border-radius:11px}
+    footer {text-align:center;color:#666c83;font-size:10px;letter-spacing:.22em;padding:24px 12px 28px}footer strong {color:#a5a9bc;font-weight:700}
+    @media(max-width:520px){main{margin-top:38px}.card{padding:18px}.options{align-items:flex-start}.result-head{display:block}.preset{align-items:flex-start;flex-direction:column}.preset-actions{width:100%}.preset-actions a,.preset-actions button{flex:1;font-size:11px}}
+  </style>
+</head>
+<body>
+<main>
+  <header class="brand"><div class="mark">✦</div><div><small>RYUUBOT tools</small><h1>AM Finder</h1></div></header>
+  <section class="hero"><div class="eyebrow">TikTok preset search</div><h2>Temukan preset<br><span>Alight Motion.</span></h2><p>Tempel link video TikTok dan temukan link preset yang dibagikan kreatornya.</p></section>
+  <section class="card">
+    <form id="search-form">
+      <label class="field-label" for="url">URL TikTok</label>
+      <div class="input-wrap"><span class="icon">↗</span><input id="url" name="url" type="url" placeholder="https://www.tiktok.com/@user/video/123456789" required></div>
+      <div class="options"><label class="toggle"><input id="only-alightcreative" type="checkbox"><span class="switch"></span><span>Tampilkan hanya alightcreative</span></label></div>
+      <button id="submit" type="submit">Cari Preset</button>
+    </form>
+    <div id="status" class="status status-log" role="status" aria-live="polite" aria-atomic="false"></div>
+    <section id="results" aria-live="polite"></section>
+  </section>
+</main>
+<footer><strong>RYUUBOT</strong> / PRESET FINDER</footer>
+<script>
+  const form = document.querySelector('#search-form');
+  const button = document.querySelector('#submit');
+  const statusBox = document.querySelector('#status');
+  const results = document.querySelector('#results');
+  const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  async function copyLink(url) {
+    try {
+      await navigator.clipboard.writeText(url);
+      statusBox.className = 'status show ok';
+      statusBox.textContent = 'Link preset disalin.';
+    } catch (error) {
+      statusBox.className = 'status show error';
+      statusBox.textContent = 'Gagal menyalin link. Pastikan browser mengizinkan akses clipboard.';
+    }
+  }
+
+  form.addEventListener('submit', async event => {
+    event.preventDefault();
+    button.disabled = true;
+    button.innerHTML = '<span class="spinner"></span>Mencari...';
+    statusBox.className = 'status status-log show loading';
+    statusBox.textContent = '';
+    const addLog = message => {
+      const line = document.createElement('div');
+      line.className = 'log-line';
+      line.textContent = message;
+      statusBox.appendChild(line);
+      statusBox.scrollTop = statusBox.scrollHeight;
+    };
+    results.style.display = 'none'; results.innerHTML = '';
+    try {
+      const response = await fetch('/search', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:document.querySelector('#url').value,only_alightcreative:document.querySelector('#only-alightcreative').checked})});
+      if (!response.ok) {
+        const payload = await response.json().catch(() => ({}));
+        throw new Error(payload.error || `Permintaan gagal (HTTP ${response.status}).`);
+      }
+      if (!response.body) throw new Error('Browser tidak mendukung pembacaan stream.');
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let pending = '';
+      let resultPayload = null;
+      let streamError = null;
+      const handleLine = line => {
+        if (!line.trim()) return;
+        const event = JSON.parse(line);
+        if (event.type === 'log') addLog(event.message);
+        else if (event.type === 'result') resultPayload = event;
+        else if (event.type === 'error') {
+          streamError = event.error || 'Pencarian gagal.';
+          addLog(`Error: ${streamError}`);
+        }
+      };
+      while (true) {
+        const {value, done} = await reader.read();
+        pending += decoder.decode(value || new Uint8Array(), {stream:!done});
+        const lines = pending.split('\n');
+        pending = lines.pop();
+        for (const line of lines) handleLine(line);
+        if (done) break;
+      }
+      if (pending.trim()) handleLine(pending);
+      if (streamError) throw new Error(streamError);
+      if (!resultPayload?.success) throw new Error('Stream berakhir sebelum hasil pencarian diterima.');
+
+      const item = resultPayload.result;
+      const links = item.preset_links.length ? `<div class="preset-list">${item.preset_links.map(link => `<article class="preset"><div><div class="preset-title">${escapeHtml(link.title)}</div><div class="preset-meta">${escapeHtml(link.source)} · ${escapeHtml(link.type)}</div></div><div class="preset-actions"><a href="${escapeHtml(link.url)}" target="_blank" rel="noopener noreferrer">Buka preset ↗</a><button type="button" data-url="${escapeHtml(link.url)}" onclick="copyLink(this.dataset.url)">Salin Link</button></div></article>`).join('')}</div>` : '<div class="empty">Preset tidak ditemukan untuk video ini.</div>';
+      results.innerHTML = `<div class="result-head"><div><h3>${escapeHtml(item.title)}</h3><div class="author">oleh ${escapeHtml(item.author)}</div></div></div><div class="stats"><div class="stat">Views <b>${escapeHtml(item.views)}</b></div><div class="stat">Likes <b>${escapeHtml(item.likes)}</b></div></div><div class="section-title">Link preset · ${item.preset_links.length}</div>${links}`;
+      results.style.display = 'block';
+      statusBox.className = 'status status-log show ok';
+    } catch (error) {
+      const lastLine = statusBox.lastElementChild?.textContent || '';
+      if (!lastLine.startsWith('> Error:')) addLog(`Error: ${error.message}`);
+      statusBox.className = 'status status-log show error';
+    } finally {
+      button.disabled = false; button.textContent = 'Cari Preset';
+    }
+  });
+</script>
+</body>
+</html>
